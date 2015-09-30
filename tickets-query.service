@@ -1,0 +1,19 @@
+[Unit]
+Description=Sample tickets query microservice
+
+#Uncomment the following line when not running systemd in user mode
+#After=network.target
+
+[Service]
+#Uncomment the following line to run the service as a specific user
+#User=seba
+
+Environment="MONGO_URL=mongodb://127.0.0.1:27018/test"
+
+ExecStart=/usr/bin/node /home/seba/Projects/Ingadv/Auth0/blog-code/microservices/server.js
+ExecStartPost=/usr/bin/mongo --eval 'db.services.insert({"name": "Tickets Query Service", "url": "/tickets", "endpoints": [{"type": "http", "url": "http://127.0.0.1:3001/tickets"}], "authorizedRoles": ["tickets-query"] });' 127.0.0.1:27017/test
+ExecStopPost=/usr/bin/mongo --eval 'db.services.remove({"name": "Tickets Query Service"});' 127.0.0.1:27017/test
+
+[Install]
+WantedBy=default.target
+
